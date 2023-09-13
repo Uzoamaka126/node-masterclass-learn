@@ -9,14 +9,16 @@ const environments = {};
 environments.development = {
     'httpPort': 3000,
     'httpsPort': 3001,
-    'name': 'development'
+    'name': 'development',
+    'hashingSecret': 'sweet'
 }
 
 // prod environment
 environments.production = {
     'httpPort': 5000,
     'httpsPort': 5001,
-    'name': 'production'
+    'name': 'production',
+    'hashingSecret': 'awesome'
 }
 
 // Determine the current env to export
