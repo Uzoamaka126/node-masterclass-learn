@@ -9,8 +9,9 @@ const https = require("https");
 const url = require("url");
 const StringDecoder = require('string_decoder').StringDecoder;
 const router = require('./lib/handlers');
-const config = require('./config');
+const config = require('./lib/config');
 const fs = require('fs');
+const helpers = require('./utils/helper');
 const _data = require('./lib/data')
 
 // Testing
@@ -27,9 +28,9 @@ const _data = require('./lib/data')
 //     console.log({ err });
 // })
 
-_data.delete('test', 'newFile', function(err) {
-    console.log({ err });
-})
+// _data.delete('test', 'newFile', function(err) {
+//     console.log({ err });
+// })
 
 const httpsServerOptions = {
     'key': fs.readFileSync('./https/key.pem'),
@@ -100,7 +101,8 @@ const unifiedServer = function(req, res) {
             queryStringObj,
             method,
             headers,
-            payload: buffer
+            // make sure that the payload coming in is a parsed JSON
+            payload: helpers.parseJSONToObject(buffer)
         }
 
         // Route the request to the handler specified in the router

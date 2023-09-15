@@ -2,22 +2,30 @@
 * helper functions 
 */
 const crypto = require('crypto');
-const config = require('../config');
+const config = require('../lib/config');
 
-function isStringValid(obj, key, num = 0) {
-    if (!obj[key] || (typeof(obj[key]) !== 'string')) {
+function isStringValid(value, num = 0) {
+    if (!value || (typeof(value) !== 'string')) {
         return false
     }
 
-    if (obj[key]?.trim().length <= num) {
+    if (value?.trim().length <= num) {
         return false
     }
 
     return true
 }
 
+function isBoolValid(val) {
+    if (typeof val !== 'boolean') {
+        return false
+    }
+    return true
+}
+
 function hash(value) {
-    if (typeof val === 'string' && value.length > 0) {
+    console.log({ value });
+    if (typeof value === 'string' && value.length > 0) {
         // hash with sha-256
         const hash = crypto.createHmac('sha256', config.hashingSecret).update(value).digest('hex');
         return hash;
@@ -26,7 +34,18 @@ function hash(value) {
     }
 }
 
+function parseJSONToObject(str) {
+    try {
+        const obj = JSON.parse(str);
+        return obj;
+    } catch (err) {
+        return {}
+    }
+}
+
 module.exports = {
     isStringValid,
-    hash
+    hash,
+    parseJSONToObject,
+    isBoolValid
 }
