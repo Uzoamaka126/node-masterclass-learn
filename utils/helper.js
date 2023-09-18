@@ -59,10 +59,24 @@ function generateRandomString(num = 20) {
     }
 }
 
+function isTypeOfValid(value, type) {
+    if (typeof (value) === type) {
+        return true
+    } else {
+        return false
+    }
+}
+
+function isInstanceOfArray(item) {
+    return item instanceof Array
+}
+
 module.exports = {
     isStringValid,
     hash,
     parseJSONToObject,
     isBoolValid,
-    generateRandomString
+    generateRandomString,
+    isTypeOfValid,
+    isInstanceOfArray
 }
