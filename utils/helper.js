@@ -6,61 +6,6 @@ const config = require('../lib/config');
 const queryString = require('querystring');
 const https = require("https")
 
-function sendTwilioSms(phone, msg, callback) {
-    // validate phone and messge
-    phone = helpers.isTypeOfValid(phone, "string") && helpers.isStringValid(phone, 10) ? phone.trim() : false;
-    msg = helpers.isTypeOfValid(msg, "string") && helpers.isStringValid(msg, 0, 1600) ? msg.trim() : false;
-
-   if (phone && msg) {
-    // configure the request payload being sent to Twilio
-        const payload = {
-            "From": config.twilio.fromPhone, // sender phone
-            "To": `+1${phone}`,
-            "Body": msg
-        }
-        // stringfy the payload 
-        const stringfiedPayload = queryString(payload);
-
-        // configure the https request details
-        const reqDetails = {
-            'protocol': 'https',
-            'hostname': 'api.twilio.com',
-            'method': 'POST',
-            'path': `/2023-09-23/${config.twilio.accountSid}/Messages.json`,
-            'auth': `${config.twilio.accountSid}:${config.twilio.authToken}`,
-            'headers': {
-                'Content-Type': 'application/x-www-form-url-encoded', // standard form being posted
-                'Content-Length': Buffer.byteLength(stringfiedPayload) // get the byte length of the stringified payload
-            }
-        };
-
-        // instantiate the request object
-        const req = https.request(reqDetails, function(resObj) {
-            // grab the status of the sent request
-            const status = res.statusCode;
-            // use callback if the request successfully went through
-            if (status === 200 || status === 201) {
-                callback(false)
-            } else {
-                callback(`Status code returned was ${status}`)
-            }
-        }); // send off the details
-
-        // bind to an error event so it doesn't get thrown
-        req.on('error', function(err) {
-            callback(err)
-        })
-        // add the string payload
-        req.write(stringfiedPayload);
-
-        // send off/end the request
-        req.end()
-
-   } else {
-    callback("Required fields missing or invalid")
-   }
-}
-
 function isStringValid(value, minNum = 0, maxNum) {
     if (!value || (typeof(value) !== 'string')) {
         return false
@@ -130,6 +75,62 @@ function isTypeOfValid(value, type) {
 
 function isInstanceOfArray(item) {
     return item instanceof Array
+}
+
+function sendTwilioSms(phone, msg, callback) {
+    // validate phone and messge
+    phone = isTypeOfValid(phone, "string") && isStringValid(phone, 10) ? phone.trim() : false;
+    msg = isTypeOfValid(msg, "string") && isStringValid(msg, 0, 1600) ? msg.trim() : false;
+
+   if (phone && msg) {
+    // configure the request payload being sent to Twilio
+        const payload = {
+            "From": config.twilio.fromPhone, // sender phone
+            "To": `+1${phone}`,
+            "Body": msg
+        }
+        // stringfy the payload 
+        const stringfiedPayload = queryString.stringify(payload);
+
+        // configure the https request details
+        const reqDetails = {
+            'protocol': 'https:',
+            'hostname': 'api.twilio.com',
+            'method': 'POST',
+            'path': `/2010-04-01/Accounts/${config.twilio.accountSid}/Messages.json`,
+            'auth': `${config.twilio.accountSid}:${config.twilio.authToken}`,
+            'headers': {
+                'Content-Type': 'application/x-www-form-url-encoded', // standard form being posted
+                'Content-Length': Buffer.byteLength(stringfiedPayload) // get the byte length of the stringified payload
+            }
+        };
+
+        // instantiate the request object
+        const req = https.request(reqDetails, function(res) {
+            console.log({ res });
+            // grab the status of the sent request
+            const status = res.statusCode;
+            // use callback if the request successfully went through
+            if (status === 200 || status === 201) {
+                callback(false)
+            } else {
+                callback(`Status code returned was ${status}`)
+            }
+        }); // send off the details
+
+        // bind to an error event so it doesn't get thrown
+        req.on('error', function(err) {
+            callback(err)
+        })
+        // add the string payload
+        req.write(stringfiedPayload);
+
+        // send off/end the request
+        req.end()
+
+   } else {
+    callback("Required fields missing or invalid")
+   }
 }
 
 module.exports = {
