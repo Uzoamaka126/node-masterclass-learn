@@ -32,6 +32,9 @@ const _data = require('./lib/data')
 //     console.log({ err });
 // })
 
+// @TODO REMOVE THIS
+helpers.sendTwilioSms('+')
+
 const httpsServerOptions = {
     'key': fs.readFileSync('./https/key.pem'),
     'cer': fs.readFileSync('./https/cert.pem')
