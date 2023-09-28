@@ -33,9 +33,9 @@ const _data = require('./lib/data')
 // })
 
 // @TODO REMOVE THIS
-helpers.sendTwilioSms('4158375309', 'Hello!', function(err) {
-    console.log({ errOccurred: err });
-})
+// helpers.sendTwilioSms('4158375309', 'Hello!', function(err) {
+//     console.log({ errOccurred: err });
+// })
 
 const httpsServerOptions = {
     'key': fs.readFileSync('./https/key.pem'),

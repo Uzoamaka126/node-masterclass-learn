@@ -94,27 +94,26 @@ function sendTwilioSms(phone, msg, callback) {
 
         // configure the https request details
         const reqDetails = {
-            'protocol': 'https:',
-            'hostname': 'api.twilio.com',
-            'method': 'POST',
-            'path': `/2010-04-01/Accounts/${config.twilio.accountSid}/Messages.json`,
-            'auth': `${config.twilio.accountSid}:${config.twilio.authToken}`,
-            'headers': {
-                'Content-Type': 'application/x-www-form-url-encoded', // standard form being posted
+            'protocol' : 'https:',
+            'hostname' : 'api.twilio.com',
+            'method' : 'POST',
+            'path' : '/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json',
+            'auth' : config.twilio.accountSid+':'+config.twilio.authToken,
+            'headers' : {
+                'Content-Type' : 'application/x-www-form-urlencoded',  // standard form being posted
                 'Content-Length': Buffer.byteLength(stringfiedPayload) // get the byte length of the stringified payload
             }
         };
 
         // instantiate the request object
-        const req = https.request(reqDetails, function(res) {
-            console.log({ res });
-            // grab the status of the sent request
-            const status = res.statusCode;
-            // use callback if the request successfully went through
-            if (status === 200 || status === 201) {
-                callback(false)
+        const req = https.request(reqDetails, function(res){
+            // Grab the status of the sent request
+            const status =  res.statusCode;
+            // Callback successfully if the request went through
+            if (status === 200 || status === 201){
+              callback(false);
             } else {
-                callback(`Status code returned was ${status}`)
+                callback(`Status code returned is ${status}`)
             }
         }); // send off the details
 
@@ -128,9 +127,9 @@ function sendTwilioSms(phone, msg, callback) {
         // send off/end the request
         req.end()
 
-   } else {
-    callback("Required fields missing or invalid")
-   }
+    } else {
+        callback("Required fields missing or invalid")
+    }
 }
 
 module.exports = {
