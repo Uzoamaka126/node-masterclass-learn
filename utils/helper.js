@@ -132,6 +132,24 @@ function sendTwilioSms(phone, msg, callback) {
     }
 }
 
+function computeRequestHandler(obj, trimmedPath) {
+    let selectedRequestHandler;
+        
+    const objKeys = Object.keys(obj);
+
+    for (var i = 0; i < objKeys.length; i++) {
+        if (trimmedPath.includes(objKeys[i])) {
+            selectedRequestHandler = obj[objKeys[i]];
+            break;
+        } else {
+            // if no route path matches, return the function associated with the 404 route
+            selectedRequestHandler = obj['404']
+        }
+    }
+
+    return selectedRequestHandler;
+}
+
 module.exports = {
     isStringValid,
     hash,
@@ -140,5 +158,6 @@ module.exports = {
     generateRandomString,
     isTypeOfValid,
     isInstanceOfArray,
-    sendTwilioSms
+    sendTwilioSms,
+    computeRequestHandler
 }
