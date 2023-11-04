@@ -4,7 +4,9 @@
 const crypto = require('crypto');
 const config = require('../lib/config');
 const queryString = require('querystring');
-const https = require("https")
+const https = require("https");
+const path = require('path');
+const fs = require('fs');
 
 function isStringValid(value, minNum = 0, maxNum) {
     if (!value || (typeof(value) !== 'string')) {
@@ -150,6 +152,23 @@ function computeRequestHandler(obj, trimmedPath) {
     return selectedRequestHandler;
 }
 
+// get the string contents of a template
+function getTemplate(templateName = '', callback) {
+    const name = isTypeOfValid(templateName, 'string') && templateName.length > 0 ? templateName : ''
+    if (name) {
+            const templateDir = path.join(__dirname, '/../templates/');
+            fs.readFile(templateDir+name+'.html', 'utf-8', function(err, str) {
+                if (!err && str && str.length > 0) {
+                    callback(false, str)
+                } else {
+                    callback('No template found');
+                }
+            })
+    } else {
+        callback('A valid template name was not specified')
+    }
+}
+
 module.exports = {
     isStringValid,
     hash,
@@ -159,5 +178,6 @@ module.exports = {
     isTypeOfValid,
     isInstanceOfArray,
     sendTwilioSms,
-    computeRequestHandler
+    computeRequestHandler,
+    getTemplate
 }
