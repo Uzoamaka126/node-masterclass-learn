@@ -136,14 +136,14 @@ function sendTwilioSms(phone, msg, callback) {
 
 function computeRequestHandler(obj, trimmedPath) {
     let selectedRequestHandler;
-        
-    const objKeys = Object.keys(obj);
 
-    for (var i = 0; i < objKeys.length; i++) {
-        if (trimmedPath.includes(objKeys[i])) {
-            selectedRequestHandler = obj[objKeys[i]];
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key) && trimmedPath.includes(key)) {
+            console.log('obj.hasOwnProperty(key) && trimmedPath.includes(key)');
+            selectedRequestHandler = obj[key];
             break;
         } else {
+            console.log('else');
             // if no route path matches, return the function associated with the 404 route
             selectedRequestHandler = obj['404']
         }
@@ -169,6 +169,19 @@ function getTemplate(templateName = '', callback) {
     }
 }
 
+// take a given string and data object and find/replace all the keys within it
+function interpolate(str, data) {
+    str = isTypeOfValid(str, 'string') && str.length > 0 ? str : '';
+    data = isTypeOfValid(data, 'object') && data !== null ? data : {};
+    
+    // add the template globals to the data object, prepending their key names with "globals"
+    for (var keyName in config.templateGlobals) {
+        if (config.templateGlobals.hasOwnProperty(keyName)) {
+
+        }
+    }
+}
+
 module.exports = {
     isStringValid,
     hash,
@@ -179,5 +192,6 @@ module.exports = {
     isInstanceOfArray,
     sendTwilioSms,
     computeRequestHandler,
-    getTemplate
+    getTemplate,
+    interpolate
 }
