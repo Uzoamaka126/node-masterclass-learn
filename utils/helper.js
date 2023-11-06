@@ -153,20 +153,49 @@ function computeRequestHandler(obj, trimmedPath) {
 }
 
 // get the string contents of a template
-function getTemplate(templateName = '', callback) {
-    const name = isTypeOfValid(templateName, 'string') && templateName.length > 0 ? templateName : ''
-    if (name) {
-            const templateDir = path.join(__dirname, '/../templates/');
-            fs.readFile(templateDir+name+'.html', 'utf-8', function(err, str) {
-                if (!err && str && str.length > 0) {
-                    callback(false, str)
-                } else {
-                    callback('No template found');
-                }
-            })
+function getTemplate(templateName = '', data, callback) {
+    templateName = isTypeOfValid(templateName, 'string') && templateName.length > 0 ? templateName : '';
+    data = isTypeOfValid(data, 'object') && data !== null ? data : {};
+
+    if (templateName) {
+        const templateDir = path.join(__dirname, '/../templates/');
+        
+        fs.readFile(templateDir+templateName+'.html', 'utf-8', function(err, str) {
+            if (!err && str && str.length > 0) {
+                // do interpolation on the string before returning it
+                const finalStr = interpolate(str, data);
+                callback(false, finalStr)
+            } else {
+                callback('No template found');
+            }
+        });
     } else {
         callback('A valid template name was not specified')
     }
+}
+
+// add the global header and footer to a string and pass the provided data object to the header and footer for interpolation
+function addGlobalTemplates(str, data, callback) {
+    str = isTypeOfValid(str, 'string') && str.length > 0 ? str : '';
+    data = isTypeOfValid(data, 'object') && data !== null ? data : {};
+
+    // get the header
+    getTemplate('_header', data, function(err, headerStr) {
+        if (!err && headerStr) {
+            // get the footer
+            getTemplate("_footer", data, function(err, footerStr) {
+                if (!err && footerStr) {
+                    // add them all together
+                    const combinedStr = headerStr+str+footerStr;
+                    callback(false, combinedStr);
+                } else {
+                    callback("Could not find the footer template")
+                }
+            })
+        } else {
+            callback("Could not find the header template")
+        }
+    });
 }
 
 // take a given string and data object and find/replace all the keys within it
@@ -177,9 +206,19 @@ function interpolate(str, data) {
     // add the template globals to the data object, prepending their key names with "globals"
     for (var keyName in config.templateGlobals) {
         if (config.templateGlobals.hasOwnProperty(keyName)) {
-
+            data['global.'+keyName] = config.templateGlobals[keyName]; 
         }
     }
+
+    // for each key in the data object, insert its value into the string at the corresponding 
+    for (var key in data) {
+        if (data.hasOwnProperty(key) && typeof(data[key]) === 'string') {
+            const replace = data[key];
+            const find = `{${key}}`;
+            str = str.replace(find, replace);
+        }
+    }
+    return str;
 }
 
 module.exports = {
@@ -193,5 +232,6 @@ module.exports = {
     sendTwilioSms,
     computeRequestHandler,
     getTemplate,
+    addGlobalTemplates,
     interpolate
 }
