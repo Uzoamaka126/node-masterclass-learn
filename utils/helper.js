@@ -8,7 +8,9 @@ const https = require("https");
 const path = require('path');
 const fs = require('fs');
 
-function isStringValid(value, minNum = 0, maxNum) {
+const helpers = {};
+
+helpers.isStringValid = function(value, minNum = 0, maxNum) {
     if (!value || (typeof(value) !== 'string')) {
         return false
     }
@@ -24,14 +26,14 @@ function isStringValid(value, minNum = 0, maxNum) {
     return true
 }
 
-function isBoolValid(val) {
+helpers.isBoolValid = function(val) {
     if (typeof val !== 'boolean') {
         return false
     }
     return true
 }
 
-function hash(value) {
+helpers.hash = function(value) {
     if (typeof value === 'string' && value.length > 0) {
         // hash with sha-256
         const hash = crypto.createHmac('sha256', config.hashingSecret).update(value).digest('hex');
@@ -41,7 +43,7 @@ function hash(value) {
     }
 }
 
-function parseJSONToObject(str) {
+helpers.parseJSONToObject = function(str) {
     try {
         const obj = JSON.parse(str);
         return obj;
@@ -50,7 +52,7 @@ function parseJSONToObject(str) {
     }
 }
 
-function generateRandomString(num = 20) {
+helpers.generateRandomString = function(num = 20) {
     if (num > 0) {
         const possibleCharacters = 'abcdefghijklmnopqrstuvwxyz1234567890';
         let str = '';
@@ -67,7 +69,7 @@ function generateRandomString(num = 20) {
     }
 }
 
-function isTypeOfValid(value, type) {
+helpers.isTypeOfValid = function(value, type) {
     if (typeof (value) === type) {
         return true
     } else {
@@ -75,14 +77,14 @@ function isTypeOfValid(value, type) {
     }
 }
 
-function isInstanceOfArray(item) {
+helpers.isInstanceOfArray = function(item) {
     return item instanceof Array
 }
 
-function sendTwilioSms(phone, msg, callback) {
+helpers.sendTwilioSms = function (phone, msg, callback) {
     // validate phone and messge
-    phone = isTypeOfValid(phone, "string") && isStringValid(phone, 10) ? phone.trim() : false;
-    msg = isTypeOfValid(msg, "string") && isStringValid(msg, 0, 1600) ? msg.trim() : false;
+    phone = helpers.isTypeOfValid(phone, "string") && helpers.isStringValid(phone, 10) ? phone.trim() : false;
+    msg = helpers.isTypeOfValid(msg, "string") && helpers.isStringValid(msg, 0, 1600) ? msg.trim() : false;
 
    if (phone && msg) {
     // configure the request payload being sent to Twilio
@@ -134,7 +136,7 @@ function sendTwilioSms(phone, msg, callback) {
     }
 }
 
-function computeRequestHandler(obj, trimmedPath) {
+helpers.computeRequestHandler = function(obj, trimmedPath) {
     let selectedRequestHandler;
 
     for (const key in obj) {
@@ -153,9 +155,9 @@ function computeRequestHandler(obj, trimmedPath) {
 }
 
 // get the string contents of a template
-function getTemplate(templateName = '', data, callback) {
-    templateName = isTypeOfValid(templateName, 'string') && templateName.length > 0 ? templateName : '';
-    data = isTypeOfValid(data, 'object') && data !== null ? data : {};
+helpers.getTemplate = function(templateName = '', data, callback) {
+    templateName = helpers.isTypeOfValid(templateName, 'string') && templateName.length > 0 ? templateName : '';
+    data = helpers.isTypeOfValid(data, 'object') && data !== null ? data : {};
 
     if (templateName) {
         const templateDir = path.join(__dirname, '/../templates/');
@@ -163,7 +165,7 @@ function getTemplate(templateName = '', data, callback) {
         fs.readFile(templateDir+templateName+'.html', 'utf-8', function(err, str) {
             if (!err && str && str.length > 0) {
                 // do interpolation on the string before returning it
-                const finalStr = interpolate(str, data);
+                const finalStr = helpers.interpolate(str, data);
                 callback(false, finalStr)
             } else {
                 callback('No template found');
@@ -175,15 +177,15 @@ function getTemplate(templateName = '', data, callback) {
 }
 
 // add the global header and footer to a string and pass the provided data object to the header and footer for interpolation
-function addGlobalTemplates(str, data, callback) {
-    str = isTypeOfValid(str, 'string') && str.length > 0 ? str : '';
-    data = isTypeOfValid(data, 'object') && data !== null ? data : {};
+helpers.addGlobalTemplates = function(str, data, callback) {
+    str = helpers.isTypeOfValid(str, 'string') && str.length > 0 ? str : '';
+    data = helpers.isTypeOfValid(data, 'object') && data !== null ? data : {};
 
     // get the header
-    getTemplate('_header', data, function(err, headerStr) {
+    helpers.getTemplate('_header', data, function(err, headerStr) {
         if (!err && headerStr) {
             // get the footer
-            getTemplate("_footer", data, function(err, footerStr) {
+            helpers.getTemplate("_footer", data, function(err, footerStr) {
                 if (!err && footerStr) {
                     // add them all together
                     const combinedStr = headerStr+str+footerStr;
@@ -199,9 +201,9 @@ function addGlobalTemplates(str, data, callback) {
 }
 
 // take a given string and data object and find/replace all the keys within it
-function interpolate(str, data) {
-    str = isTypeOfValid(str, 'string') && str.length > 0 ? str : '';
-    data = isTypeOfValid(data, 'object') && data !== null ? data : {};
+helpers.interpolate = function(str, data) {
+    str = helpers.isTypeOfValid(str, 'string') && str.length > 0 ? str : '';
+    data = helpers.isTypeOfValid(data, 'object') && data !== null ? data : {};
     
     // add the template globals to the data object, prepending their key names with "globals"
     for (var keyName in config.templateGlobals) {
@@ -221,17 +223,31 @@ function interpolate(str, data) {
     return str;
 }
 
-module.exports = {
-    isStringValid,
-    hash,
-    parseJSONToObject,
-    isBoolValid,
-    generateRandomString,
-    isTypeOfValid,
-    isInstanceOfArray,
-    sendTwilioSms,
-    computeRequestHandler,
-    getTemplate,
-    addGlobalTemplates,
-    interpolate
+// compare incoming http methods with a list of allowed http methods
+helpers.checkAllowedMethods = function(method) {
+    const allowedHttpsMethods = ['post', 'get', 'put', 'delete'];
+
+    if (allowedHttpsMethods.indexOf(method) > -1) {
+        return true
+    } else {
+        return false
+    }
 }
+
+helpers.getStaticAssets = function(fileName, callback) {
+    fileName = helpers.isTypeOfValid(fileName, 'string') ? fileName : ''
+    if (fileName) {
+        const publicDir = path.join(__dirname, '/../public/');
+        fs.readFile(publicDir+fileName, function(err, data) {
+            if (!err && data) {
+                callback(false, data)
+            } else {
+                callback("no file was found")
+            }
+        })
+    } else {
+        callback("Invalid file name")
+    }
+}
+
+module.exports = helpers;
