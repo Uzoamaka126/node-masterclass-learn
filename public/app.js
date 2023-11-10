@@ -90,8 +90,7 @@ app.client.request = function({ headers, path, method, queryStringObj, payload, 
 
 app.bindForms = function(){
     const form = document.querySelector("form");
-    console.log({ form });
-
+    
     form.addEventListener("submit", function(e){
   
       // Stop it from submitting
