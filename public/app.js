@@ -21,11 +21,11 @@ app.client = {};
  * Options params:
     * headers, path, method, queryStringObj, payload, callback
 */
-app.client.request = function({ headers, path, method, queryStringObj, payload, callback }) {    
+app.client.request = function(headers, path, method, queryStringObj, payload, callback) {    
     headers = app.isTypeOfValid(headers, "object") && headers !== null ? headers : {};
-    path = app.isTypeOfValid(path, "string") ? path : '';
-    method = app.isTypeOfValid(method, "string") && ['POST', 'GET', 'PUT', 'DELETE'].indexOf(method) > -1 ? method : '';
-    queryStringObj = app.isTypeOfValid(queryStringObj, "object") && queryStringObj !== null ? queryStringObj : {};
+    path = path && app.isTypeOfValid(path, "string") ? path : '';
+    method = method && app.isTypeOfValid(method, "string") && ['POST', 'GET', 'PUT', 'DELETE'].indexOf(method) > -1 ? method : '';
+    queryStringObj = queryStringObj && app.isTypeOfValid(queryStringObj, "object") && queryStringObj !== null ? queryStringObj : {};
     payload = app.isTypeOfValid(payload, "object") && payload !== null ? payload : {};
     callback = app.isTypeOfValid(payload, "function") ? callback : false;
 
@@ -90,35 +90,36 @@ app.client.request = function({ headers, path, method, queryStringObj, payload, 
 
 app.bindForms = function(){
     const form = document.querySelector("form");
-    
+
     form.addEventListener("submit", function(e){
   
       // Stop it from submitting
       e.preventDefault();
-      var formId = this.id;
-      var path = this.action;
-      var method = this.method.toUpperCase();
+      const formId = this.id;
+      const path = this.action;
+      const method = this.method.toUpperCase();
   
       // Hide the error message (if it's currently shown due to a previous error)
       document.querySelector("#"+formId+" .formError").style.display = 'hidden';
   
       // Turn the inputs into a payload
-      var payload = {};
-      var elements = this.elements;
-      for(var i = 0; i < elements.length; i++){
-        if(elements[i].type !== 'submit'){
-          var valueOfElement = elements[i].type == 'checkbox' ? elements[i].checked : elements[i].value;
+      const payload = {};
+      const elements = this.elements;
+      
+      for (let i = 0; i < elements.length; i++){
+        if (elements[i].type !== 'submit'){
+          const valueOfElement = elements[i].type == 'checkbox' ? elements[i].checked : elements[i].value;
           payload[elements[i].name] = valueOfElement;
         }
       }
   
       // Call the API
-      app.client.request(undefined,path,method,undefined,payload,function(statusCode,responsePayload){
+      app.client.request(undefined, path, method, undefined, payload, function(statusCode, responsePayload){
         // Display an error on the form if needed
-        if(statusCode !== 200){
+        if (statusCode !== 200){
   
           // Try to get the error from the api, or set a default error message
-          var error = typeof(responsePayload.Error) == 'string' ? responsePayload.Error : 'An error has occured, please try again';
+          const error = typeof(responsePayload.Error) == 'string' ? responsePayload.Error : 'An error has occured, please try again';
   
           // Set the formError field with the error text
           document.querySelector("#"+formId+" .formError").innerHTML = error;
@@ -135,8 +136,9 @@ app.bindForms = function(){
   };
 
   // Form response processor
-app.formResponseProcessor = function(formId,requestPayload,responsePayload){
-    var functionToCall = false;
+app.formResponseProcessor = function(formId, requestPayload, responsePayload){
+    const functionToCall = false;
+
     if(formId == 'accountCreate'){
         console.log('The account create form was successfully submitted');
       // @TODO Do something here now that the account has been created successfully
