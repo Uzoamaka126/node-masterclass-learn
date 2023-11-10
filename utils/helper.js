@@ -139,13 +139,20 @@ helpers.sendTwilioSms = function (phone, msg, callback) {
 helpers.computeRequestHandler = function(obj, trimmedPath) {
     let selectedRequestHandler;
 
-    for (const key in obj) {
-        if (obj.hasOwnProperty(key) && trimmedPath.includes(key)) {
-            console.log('obj.hasOwnProperty(key) && trimmedPath.includes(key)');
-            selectedRequestHandler = obj[key];
-            break;
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            const modifiedKey = key.replace('api/', '');
+
+            if (trimmedPath !== '' && trimmedPath.split("/")[0] === modifiedKey) {
+                selectedRequestHandler = obj[key];
+                break;
+            } 
+            
+            if (trimmedPath === '' && trimmedPath.includes(modifiedKey)) {
+                selectedRequestHandler = obj[key];
+                break;
+            } 
         } else {
-            console.log('else');
             // if no route path matches, return the function associated with the 404 route
             selectedRequestHandler = obj['404']
         }
