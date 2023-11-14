@@ -6,6 +6,7 @@
 // Dependencies
 const server = require('./lib/server');
 const backgroundWorkers = require('./lib/bgWorkers');
+const cli = require('./lib/cli');
 
 // Declare the app
 const app = {};
@@ -17,6 +18,11 @@ app.init = function() {
 
     // start the worker
     backgroundWorkers.init();
+
+    // start the CLI
+   setTimeout(() => {
+        cli.init();
+   }, 50)
 }
 
 // execute the app
