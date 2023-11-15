@@ -10,20 +10,12 @@ const fs = require('fs');
 
 const helpers = {};
 
-helpers.isStringValid = function(value, minNum = 0, maxNum) {
-    if (!value || (typeof(value) !== 'string')) {
+helpers.trimString = function(value, num = 0) {
+    if (value.trim().length > num) {
+        return true
+    } else {
         return false
     }
-
-    if (value?.trim().length < minNum) {
-        return false
-    }
-
-    if (value?.trim().length > maxNum) {
-        return false
-    }
-
-    return true
 }
 
 helpers.isBoolValid = function(val) {
@@ -83,8 +75,8 @@ helpers.isInstanceOfArray = function(item) {
 
 helpers.sendTwilioSms = function (phone, msg, callback) {
     // validate phone and messge
-    phone = helpers.isTypeOfValid(phone, "string") && helpers.isStringValid(phone, 10) ? phone.trim() : false;
-    msg = helpers.isTypeOfValid(msg, "string") && helpers.isStringValid(msg, 0, 1600) ? msg.trim() : false;
+    phone = helpers.isTypeOfValid(phone, "string") && helpers.trimString(phone, 10) ? phone.trim() : false;
+    msg = helpers.isTypeOfValid(msg, "string") && helpers.trimString(msg, 0, 1600) ? msg.trim() : false;
 
    if (phone && msg) {
     // configure the request payload being sent to Twilio
