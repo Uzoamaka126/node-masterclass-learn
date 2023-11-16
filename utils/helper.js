@@ -256,4 +256,10 @@ helpers.getStaticAssets = function(fileName, callback) {
     }
 }
 
+helpers.toCamelCaseWithSpace = function(str) {
+    return str.replace(/[" "](.)/g, function(match, group) {
+        return group.toUpperCase();
+      });
+}
+
 module.exports = helpers;
