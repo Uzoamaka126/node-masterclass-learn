@@ -10,6 +10,11 @@ const fs = require('fs');
 
 const helpers = {};
 
+// sample for testing a function that simply returns a number
+helpers.getANumber = function() {
+    return 1;
+}
+
 helpers.trimString = function(value, num = 0) {
     if (value.trim().length > num) {
         return true
