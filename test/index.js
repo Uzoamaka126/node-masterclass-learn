@@ -3,39 +3,16 @@
 */
 
 // Dependencies
-const helpers = require('../utils/helper');
-const assert = require('assert');
+const unit = require('./unit')
 
 // app logic for the test runner
 const _app = {};
 
-_app.tests = {
-    'unit': {},
-}
-
 // test that the get number helpers function returns a number
 // done is a conventional callback many test runners use
-_app.tests.unit['helpers.getANumber should return a number'] = function(done) {
-    const value = helpers.getANumber();
 
-    assert.equal(typeof(value), "number");
-    done();
-}
-
-// test that the get number helpers function returns 1
-_app.tests.unit['helpers.getANumber should return 1'] = function(done) {
-    const value = helpers.getANumber();
-
-    assert.equal(value, 1);
-    done();
-}
-
-// test that the get number helpers function does not return 2 or any number that isn't 1
-_app.tests.unit['helpers.getANumber should not return any number that isnt 1'] = function(done) {
-    const value = helpers.getANumber();
-
-    assert.notEqual(value, 2);
-    done();
+_app.tests = {
+    'unit': unit,
 }
 
 _app.countTests = function() {
