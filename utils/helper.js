@@ -140,13 +140,6 @@ helpers.computeRequestHandler = function(obj, trimmedPath) {
         if (obj.hasOwnProperty(key)) {
             const modifiedKey = key.replace('api/', '');
 
-            // console.log({ 
-            //     trimmedPath, 
-            //     'trimmedPath.split("/")[0]': trimmedPath.split("/")[0],
-            //     key,
-            //     modifiedKey 
-            // });
-
             if (trimmedPath !== '' && (trimmedPath.split("/")[0] === modifiedKey || trimmedPath.split("/")[1] === modifiedKey)) {
                 selectedRequestHandler = obj[key];
                 break;
